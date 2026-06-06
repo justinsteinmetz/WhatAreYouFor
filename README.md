@@ -1,4 +1,4 @@
-https://justinsteinmetz.github.io/What_are_you_for/
+
 
 # What Are You For?
 ### Judgment, trust, and learning in the age of AI
