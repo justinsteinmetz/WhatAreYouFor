@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Are You For? — Judgment, trust, and learning in the age of AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,400;0,9..144,700;1,9..144,200;1,9..144,400&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --bg2: #0e0e0e;
+  --surface: #141414;
+  --surface2: #1a1a1a;
+  --border: rgba(255,255,255,0.07);
+  --border-hi: rgba(255,255,255,0.14);
+  --text: #f0ece4;
+  --text-mid: #9a9488;
+  --text-dim: #5a5448;
+  --accent: #e8c87a;
+  --accent-dim: rgba(232,200,122,0.08);
+  --accent-hi: rgba(232,200,122,0.18);
+  --red: #d44a2a;
+  --red-dim: rgba(212,74,42,0.1);
+  --green: #4a8a5a;
+  --green-dim: rgba(74,138,90,0.1);
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'Syne', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* grain */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 999; opacity: 0.4; mix-blend-mode: overlay;
+}
+
+/* ── SCREENS ── */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: block; }
+
+/* ── INTRO ── */
+#intro {
+  display: none;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100vh;
+  padding: clamp(2rem,6vw,5rem);
+  position: relative;
+  overflow: hidden;
+}
+#intro.active { display: flex; }
+
+#intro::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 70% 30%, rgba(232,200,122,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.intro-eyebrow {
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 2.5rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.intro-eyebrow::before {
+  content: ''; display: block;
+  width: 28px; height: 1px;
+  background: var(--accent); flex-shrink: 0;
+}
+
+.intro-title {
+  font-family: var(--serif);
+  font-size: clamp(3.5rem, 9vw, 7.5rem);
+  font-weight: 200;
+  font-style: italic;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+}
+
+.intro-title em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.intro-question-mark {
+  font-family: var(--serif);
+  font-weight: 200;
+  font-style: italic;
+  color: var(--text-dim);
+}
+
+.intro-rule {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  color: var(--text-mid);
+  line-height: 1.7;
+  max-width: 52ch;
+  margin: 2rem 0 2.5rem;
+}
+
+.intro-rule strong { color: var(--text); font-style: normal; font-weight: 400; }
+
+.intro-meta {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 2.5rem;
+  display: flex; gap: 1.5rem; flex-wrap: wrap;
+}
+.intro-meta span::before { content: '—'; margin-right: 0.4rem; }
+
+.btn-start {
+  display: inline-flex;
+  align-items: center; gap: 0.75rem;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--accent);
+  border: none;
+  padding: 14px 28px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  align-self: flex-start;
+}
+.btn-start:hover { background: var(--text); transform: translateY(-1px); }
+.btn-start::after { content: '→'; font-size: 1rem; }
+
+/* ── CASE SCREEN ── */
+#case-screen {
+  display: none;
+  flex-direction: column;
+  min-height: 100vh;
+}
+#case-screen.active { display: flex; }
+
+/* progress line */
+.progress-line {
+  width: 100%; height: 2px;
+  background: var(--border);
+  position: relative;
+}
+.progress-fill {
+  position: absolute; top: 0; left: 0; bottom: 0;
+  background: var(--accent);
+  transition: width 0.5s ease;
+}
+
+/* case header */
+.case-header {
+  padding: 20px clamp(1.5rem,5vw,4rem) 0;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+}
+
+.case-counter {
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.case-domain {
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* case body */
+.case-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 0;
+}
+
+.case-left {
+  padding: clamp(2rem,4vw,3.5rem) clamp(1.5rem,3vw,3rem) clamp(2rem,4vw,3.5rem) clamp(1.5rem,5vw,4rem);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+}
+
+.case-kicker {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 1.2rem;
+}
+
+.case-title {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 200;
+  font-style: italic;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+.case-title strong {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--accent);
+  display: block;
+}
+
+.case-narrative {
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  color: var(--text-mid);
+  line-height: 1.75;
+  margin-bottom: 1.5rem;
+  flex: 1;
+}
+
+.case-fact {
+  background: var(--surface);
+  border-left: 2px solid var(--accent);
+  padding: 14px 18px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--text-mid);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.case-fact cite {
+  display: block;
+  font-size: 0.72rem;
+  font-style: normal;
+  font-family: var(--sans);
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+/* arguments */
+.arguments {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.arg {
+  background: var(--bg2);
+  padding: 16px 18px;
+}
+
+.arg-label {
+  font-family: var(--sans);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.arg-label.for { color: var(--green); }
+.arg-label.against { color: var(--red); }
+
+.arg-text {
+  font-family: var(--serif);
+  font-size: 0.85rem;
+  color: var(--text-mid);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* right panel — position */
+.case-right {
+  padding: clamp(2rem,4vw,3.5rem) clamp(1.5rem,5vw,4rem) clamp(2rem,4vw,3.5rem) clamp(1.5rem,3vw,3rem);
+  display: flex; flex-direction: column;
+  background: var(--bg2);
+}
+
+.position-prompt {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 200;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 2rem;
+}
+
+.position-prompt em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+/* what is lost question */
+.lost-label {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.lost-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.lost-opt {
+  background: var(--surface);
+  border: none;
+  padding: 14px 18px;
+  text-align: left;
+  font-family: var(--serif);
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  display: flex; align-items: center; gap: 12px;
+  line-height: 1.5;
+}
+
+.lost-opt::before {
+  content: '';
+  display: block; flex-shrink: 0;
+  width: 12px; height: 12px;
+  border: 1px solid var(--border-hi);
+  border-radius: 50%;
+  transition: all 0.15s;
+}
+
+.lost-opt:hover { background: var(--surface2); color: var(--text); }
+
+.lost-opt.selected {
+  background: var(--accent-dim);
+  color: var(--text);
+  border-left: 2px solid var(--accent);
+}
+
+.lost-opt.selected::before {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* position slider */
+.stance-label {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 0.75rem;
+}
+
+.stance-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.stance-opt {
+  background: var(--surface);
+  border: none;
+  padding: 14px 18px;
+  text-align: left;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  display: flex; align-items: center; gap: 12px;
+}
+
+.stance-opt::before {
+  content: '';
+  display: block; flex-shrink: 0;
+  width: 10px; height: 10px;
+  border: 1px solid var(--border-hi);
+  transition: all 0.15s;
+}
+
+.stance-opt:hover { background: var(--surface2); color: var(--text); }
+
+.stance-opt.selected-gain {
+  background: var(--green-dim);
+  color: var(--text);
+  border-left: 2px solid var(--green);
+}
+.stance-opt.selected-gain::before { background: var(--green); border-color: var(--green); }
+
+.stance-opt.selected-loss {
+  background: var(--red-dim);
+  color: var(--text);
+  border-left: 2px solid var(--red);
+}
+.stance-opt.selected-loss::before { background: var(--red); border-color: var(--red); }
+
+.stance-opt.selected-both {
+  background: var(--accent-dim);
+  color: var(--text);
+  border-left: 2px solid var(--accent);
+}
+.stance-opt.selected-both::before { background: var(--accent); border-color: var(--accent); }
+
+/* reflection textarea */
+.reflection-label {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 0.75rem;
+}
+
+.reflection-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  color: var(--text);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  padding: 14px 16px;
+  resize: none;
+  min-height: 80px;
+  outline: none;
+  transition: border-color 0.15s;
+  margin-bottom: 1.5rem;
+}
+
+.reflection-input:focus { border-color: var(--accent); }
+.reflection-input::placeholder { color: var(--text-dim); }
+
+.btn-next {
+  display: inline-flex;
+  align-items: center; gap: 0.6rem;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--accent);
+  border: none;
+  padding: 12px 22px;
+  cursor: pointer;
+  transition: background 0.15s;
+  align-self: flex-start;
+  margin-top: auto;
+}
+.btn-next:hover { background: var(--text); }
+.btn-next:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-next::after { content: '→'; }
+
+/* ── CLOSING SCREEN ── */
+#closing {
+  display: none;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100vh;
+  padding: clamp(2rem,6vw,5rem);
+  position: relative;
+}
+#closing.active { display: flex; }
+
+.closing-eyebrow {
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 3rem;
+}
+
+.closing-question {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 200;
+  font-style: italic;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 2.5rem;
+  max-width: 28ch;
+}
+
+.closing-question em {
+  font-style: normal;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.closing-textarea {
+  width: 100%;
+  max-width: 600px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-hi);
+  color: var(--text);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  padding: 12px 0;
+  resize: none;
+  min-height: 120px;
+  outline: none;
+  transition: border-color 0.2s;
+  margin-bottom: 2rem;
+}
+
+.closing-textarea:focus { border-bottom-color: var(--accent); }
+.closing-textarea::placeholder { color: var(--text-dim); }
+
+/* record */
+.record-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.record-heading {
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 1.5rem;
+}
+
+.record-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.record-card {
+  background: var(--bg2);
+  padding: 16px 18px;
+}
+
+.record-domain {
+  font-family: var(--sans);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.record-stance {
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  color: var(--text-mid);
+  font-style: italic;
+  margin-bottom: 4px;
+}
+
+.record-lost {
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+.discussion-block {
+  background: var(--surface);
+  border-left: 2px solid var(--accent);
+  padding: 20px 24px;
+  max-width: 600px;
+}
+
+.discussion-heading {
+  font-family: var(--sans);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.discussion-q {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.92rem;
+  color: var(--text-mid);
+  line-height: 1.65;
+  margin-bottom: 0.75rem;
+}
+
+.btn-restart {
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 2rem;
+  transition: color 0.15s;
+}
+.btn-restart:hover { color: var(--text); }
+
+@media (max-width: 768px) {
+  .case-body { grid-template-columns: 1fr; }
+  .case-left { border-right: none; border-bottom: 1px solid var(--border); }
+  .arguments { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ INTRO ══════════════════════════════════════════════════ -->
+<div class="screen active" id="intro">
+  <div class="intro-eyebrow">Science & Technology · Themenfeld 8 · DSP Prague</div>
+  <h1 class="intro-title">What Are<br>You <em>For</em><span class="intro-question-mark">?</span></h1>
+  <p style="font-family:var(--sans);font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-dim);margin-bottom:2rem;margin-top:0.5rem;">Judgment, trust, and learning in the age of AI</p>
+  <p class="intro-rule">
+    AI can now write, paint, diagnose, argue, and decide. It does some of these things better than most humans. <strong>Six cases. Six domains. One question that doesn't go away.</strong>
+  </p>
+  <div class="intro-meta">
+    <span>Six cases</span>
+    <span>Real events</span>
+    <span>No correct answers</span>
+  </div>
+  <button class="btn-start" onclick="startInstrument()">Begin</button>
+</div>
+
+<!-- ══ CASE SCREEN ════════════════════════════════════════════ -->
+<div class="screen" id="case-screen">
+  <div class="progress-line">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="case-header">
+    <div class="case-counter" id="caseCounter">Case 1 of 5</div>
+    <div class="case-domain" id="caseDomain">—</div>
+  </div>
+  <div class="case-body">
+    <div class="case-left">
+      <div class="case-kicker" id="caseKicker">—</div>
+      <h2 class="case-title" id="caseTitle">—</h2>
+      <p class="case-narrative" id="caseNarrative">—</p>
+      <blockquote class="case-fact" id="caseFact">—</blockquote>
+      <div class="arguments" id="caseArguments">—</div>
+    </div>
+    <div class="case-right">
+      <p class="position-prompt" id="positionPrompt">—</p>
+
+      <div class="stance-label">What happened here?</div>
+      <div class="stance-options" id="stanceOptions"></div>
+
+      <div class="lost-label">What specifically was lost — or threatened?</div>
+      <div class="lost-options" id="lostOptions"></div>
+
+      <div class="reflection-label">One sentence — your actual position.</div>
+      <textarea class="reflection-input" id="reflectionInput" placeholder="Write anything. Even a question." rows="3"></textarea>
+
+      <button class="btn-next" id="nextBtn" onclick="nextCase()" disabled>Next case</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CLOSING ════════════════════════════════════════════════ -->
+<div class="screen" id="closing">
+  <div class="closing-eyebrow">Six cases. Six domains. One question remaining.</div>
+
+  <h2 class="closing-question">If a machine can do most things you can do —<br><em>what remains worth becoming?</em></h2>
+  <p style="font-family:var(--serif);font-style:italic;font-size:1rem;color:var(--text-dim);line-height:1.7;max-width:52ch;margin-bottom:2rem;">Not: what are AI's limits. That question has a technical answer.<br>This one doesn't.</p>
+
+  <textarea class="closing-textarea" id="closingAnswer" placeholder="Not what AI can't do. What you are for." rows="6"></textarea>
+
+  <div class="record-section">
+    <div class="record-heading">Your record across six cases</div>
+    <div class="record-grid" id="recordGrid"></div>
+
+    <div class="discussion-block">
+      <div class="discussion-heading">For the room</div>
+      <div class="discussion-q">Look at where people disagreed. Which case produced the most different answers? Why that one?</div>
+      <div class="discussion-q">Is "AI can do it better" the same as "AI should do it"? What's the distinction?</div>
+      <div class="discussion-q">If the things you're best at can be replicated by a machine, does that change what you think education is for?</div>
+      <div class="discussion-q">Case 5 asks: what did you contribute that mattered? Not what AI couldn't generate — AI can generate almost anything. Ask the room to answer that question about something they've actually made with AI. Where does their judgment change the work? Where does it not?</div>
+      <div class="discussion-q" style="color: var(--text); font-style: normal; font-weight: 400; font-size: 0.95rem; border-top: 1px solid var(--border); padding-top: 0.75rem; margin-top: 0.75rem;">The closing question — what did people write? The instrument ends on: what remains worth becoming? That question has no answer the AI can generate for them.</div>
+    </div>
+  </div>
+
+  <button class="btn-restart" onclick="restart()">← Begin again</button>
+</div>
+
+<script>
+const CASES = [
+  {
+    domain: "Creative Writing",
+    kicker: "The author who wasn't there",
+    title: ["When the machine", "writes the story"],
+    narrative: "In 2023, literary magazine Clarkesworld briefly closed submissions after being flooded with AI-generated short stories — hundreds per day. The editor described the submissions as technically competent but indistinguishable from each other in a particular way: they had no failure in them. No awkward sentence that revealed a specific mind. No risk. In 2024, an AI-generated novel reached the longlist of a prestigious Japanese literary prize before the author disclosed the method. The judges said, on rereading, they could not identify which passages had been generated and which hadn't.",
+    fact: "\"The stories are not bad. That's what makes this hard. They are not bad in a way that makes you think someone is trying. They are not bad in the way that makes you want to help.\" — Neil Clarke, editor, Clarkesworld",
+    cite: "The Atlantic, February 2023",
+    argFor: "AI can produce fiction that readers cannot distinguish from human writing — even on rereading, even by expert judges. If the reading experience is identical before disclosure, the distinction between human and AI authorship is sentimental, not literary. The forgery argument works both ways: if you loved the painting before you knew it was a forgery, the love was real.",
+    argAgainst: "What readers value is not just the text but the relationship between the work and its claimed origin. When a forgery is revealed, the painting doesn\'t change — the brushstrokes are the same — but it becomes worthless. Not because it was bad. Because the relationship between the object and its supposed origin has been broken. AI authorship works the same way. The Clarkesworld submissions were not bad. The Japanese prize novel was not detectable on rereading. But when the method was disclosed, the meaning of the reading experience changed retroactively. This suggests the authorship was always part of what was being experienced — even when the reader didn\'t know it.",
+    prompt: ["When the authorship is disclosed,", "the meaning of the reading experience changes retroactively."],
+    stances: [
+      { label: "Something real was gained — texts, readers can enjoy without knowing the source", type: "gain" },
+      { label: "Something real was lost — the relationship between a work and its claimed origin", type: "loss" },
+      { label: "Both — and the love you felt before disclosure was real, which is part of the problem", type: "both" },
+    ],
+    lostOptions: [
+      "The reader's trust that the work is what it claims to be",
+      "The relationship between work and origin — broken retroactively on disclosure",
+      "The reading experience itself: real before disclosure, changed after",
+      "The economic possibility of being a working writer",
+    ]
+  },
+  {
+    domain: "Medical Diagnosis",
+    kicker: "The doctor who sees more",
+    title: ["The algorithm that", "outperforms the expert"],
+    narrative: "In 2020, a Google AI system trained on retinal scans was found to predict cardiovascular risk factors — age, sex, blood pressure, smoking status — from eye photographs alone. Human doctors, shown the same photographs, could not make these predictions. The system had found patterns invisible to human perception. In dermatology, AI diagnosis of skin cancer from photographs has repeatedly matched or exceeded the accuracy of board-certified dermatologists. In 2023, a radiology AI in the UK detected breast cancers that two independent human radiologists had missed. The cancers were real. The women were told.",
+    fact: "In a 2022 trial across six countries, an AI system for diabetic retinopathy screening performed at specialist level in settings where no specialists were available. For patients in rural India and Thailand, it was the only diagnostic tool they would ever have access to.",
+    cite: "The Lancet Digital Health, 2022",
+    argFor: "The purpose of medicine is to correctly identify and treat disease. If AI does this more accurately, more cheaply, and in places where human specialists cannot be present, the ethical case for it is overwhelming.",
+    argAgainst: "Diagnosis is not just pattern recognition. A doctor who looks at a patient is also performing a human act — witnessing suffering, establishing trust, making a person feel seen. These are not inefficiencies to be eliminated.",
+    prompt: ["AI diagnosis is now, in some domains,", "more accurate than expert human diagnosis."],
+    stances: [
+      { label: "Something real was gained — accuracy, access, lives saved", type: "gain" },
+      { label: "Something real was lost — the human act of witnessing illness", type: "loss" },
+      { label: "Both are true, and medicine will have to hold that tension", type: "both" },
+    ],
+    lostOptions: [
+      "The relationship between patient and doctor — trust built over time",
+      "The doctor's interpretation of context beyond the image",
+      "Nothing essential — diagnosis is about accuracy, not warmth",
+      "The accountability that comes with a named human decision-maker",
+    ]
+  },
+  {
+    domain: "Legal Judgment",
+    kicker: "The algorithm that decided your future",
+    title: ["COMPAS and the", "question of fairness"],
+    narrative: "COMPAS — Correctional Offender Management Profiling for Alternative Sanctions — is an algorithm used in US courts to predict the likelihood that a defendant will reoffend. Judges use its scores when making bail, sentencing, and parole decisions. In 2016, ProPublica published an analysis showing the system was twice as likely to falsely flag Black defendants as future criminals, and half as likely to falsely flag white defendants. Northpointe, the company that made COMPAS, said their algorithm was as accurate as a human judge. That claim is true and almost entirely beside the point.",
+    fact: "A 2018 study found that COMPAS predictions were no more accurate than those made by random members of the public with no criminal justice expertise, given the same information in a short paragraph. The algorithm's advantage was consistency, not insight.",
+    cite: "ProPublica, 2016 / Dressel & Farid, Science Advances, 2018",
+    argFor: "Human judges are also biased — by race, by wealth, by how recently they ate lunch. An algorithm at least applies its criteria consistently. Auditable bias may be more correctable than invisible bias.",
+    argAgainst: "An algorithm encodes historical injustice into future decisions. It does not just predict the future — it produces it. A person sentenced partly on the basis of a score they cannot see, challenge, or understand has been denied something fundamental.",
+    prompt: ["An algorithm now helps determine criminal sentences", "in thousands of American courts."],
+    stances: [
+      { label: "Something real was gained — consistency, auditability, scalability", type: "gain" },
+      { label: "Something real was lost — the right to be judged by a reasoning human being", type: "loss" },
+      { label: "Both, and the problem is that we cannot separate them", type: "both" },
+    ],
+    lostOptions: [
+      "The right to face your accuser — to see the reasoning that condemned you",
+      "The possibility of mercy — of a judge responding to context not captured in data",
+      "The individual — replaced by a statistical category derived from others like you",
+      "Accountability — no one person is responsible for what the system decided",
+    ]
+  },
+  {
+    domain: "Visual Art",
+    kicker: "The image that won the prize",
+    title: ["Jason Allen's AI painting", "and what it won"],
+    narrative: "In 2022, Jason Allen submitted an AI-generated image — created using Midjourney — to the Colorado State Fair fine arts competition. It won first place in the digital art category. Allen had not hidden that it was AI-generated. The other competitors, who had spent weeks or months producing their work by hand, were furious. The competition organisers said there was no rule against it. Artists across the internet said the rule wasn't the point. In 2023, the US Copyright Office ruled that AI-generated images cannot be copyrighted, because copyright requires human authorship. The image that won the prize cannot be owned by anyone.",
+    fact: "Illustrators, concept artists, and graphic designers began reporting significant loss of commissions in 2023 as clients switched to AI image generation. The Society of Illustrators documented a 30-40% reduction in freelance illustration income among its members in a single year.",
+    cite: "The New York Times, 2022 / Society of Illustrators, 2023",
+    argFor: "Art is about the image, not the process. If viewers respond to an AI-generated work, that response is real. Gatekeeping authorship based on method is a category error — art has always used new tools.",
+    argAgainst: "What we value in art is not just the image but the evidence of a person's specific vision, trained attention, and the thousands of hours of practice that produced the ability to make that mark. AI compresses the labour of thousands of artists into a tool that requires none.",
+    prompt: ["An AI-generated image won a fine arts competition.", "The artists who lost had spent months on their work."],
+    stances: [
+      { label: "Something real was gained — access to visual creativity without years of training", type: "gain" },
+      { label: "Something real was lost — the meaning of making something with your hands and time", type: "loss" },
+      { label: "Both, and art will survive this the way it survived photography", type: "both" },
+    ],
+    lostOptions: [
+      "The labour — thousands of hours of practice compressed into a prompt",
+      "The livelihoods of working artists who trained for years",
+      "The trace of a particular human vision inside the image",
+      "The cultural agreement about what authorship means",
+    ]
+  },
+  {
+    domain: "Human-AI Collaboration",
+    kicker: "The new thing that doesn\'t have a name yet",
+    title: ["The human contributes judgment.", "The AI contributes generation."],
+    narrative: "You could create things without AI. You did for years. AI generates things without humans constantly. The interesting question is not whether collaboration is new — humans have always collaborated. The interesting question is why the joint product is different from either output alone. A student notices the AI\'s explanation is technically correct but misses the real problem. A designer sees that the AI generated ten options and none of them solve what the client actually needs. A researcher recognises that the AI\'s synthesis is accurate but the framing is wrong. In each case, the human contribution is not the production. It is the judgment that precedes and shapes the production. They had the insight. The machine absorbed the cost of acting on it. That is what\'s new. Not that AI replaces human thinking. That AI dramatically lowers the cost of exploration — which means human judgment can now operate at a speed and scale that was previously impossible. The lazy user asks AI to think for them. The collaborative user uses AI to think with them. These look superficially similar. They are intellectually worlds apart. One student asks AI for an essay and submits it. Another asks AI for ten possible arguments, rejects eight, combines two, discovers a contradiction, and rewrites the conclusion. The first student produced work. The second student did something harder to name — and harder to see from the outside. That invisibility is the problem.",
+    fact: "\"The lazy AI essay has no scar tissue. It is complete. Nothing is missing. No argument trails off into uncertainty. It reads like something that was never in trouble. The worked collaboration has scar tissue — abandoned ideas, contradictions, revisions, moments of uncertainty, changes of direction. Struggle leaves marks. Smoothness leaves none.\"\n\nThe current education debate asks: did the student write it? That question is already obsolete. The future question is: what did the student contribute? Those are completely different questions.",
+    cite: "The distinction between using AI to produce work and using AI to think — 2024–present",
+    argFor: "When a human brings genuine judgment to AI-generated material — directing, questioning, recognising what\'s sharper, deciding what the work is for — the result is a new category of making. The human\'s contribution is real even when it leaves no visible trace in the final text. Authorship was always about the mind behind the work, not the hand that produced it.",
+    argAgainst: "If the AI generates the argument and the human approves it, the cognitive work has shifted in ways that are hard to locate and harder to assess. The question is not whether the human touched the work. It is whether the human thought it. And that question — what did you actually contribute? — is one that most people, asked honestly, cannot fully answer. The collaboration case is persuasive. That is part of the problem. Students who feel validated by it have probably not asked the question hard enough.",
+    prompt: ["The human contributes judgment.", "The AI contributes generation. The work emerges from the interaction."],
+    stances: [
+      { label: "Something real was gained — a new category of making that exceeds either alone", type: "gain" },
+      { label: "Something real was lost — the ability to locate where the thinking actually happened", type: "loss" },
+      { label: "Both — and the problem students are inheriting is that this tension won\'t resolve", type: "both" },
+    ],
+    lostOptions: [
+      "The ability to answer honestly: what did I contribute that the AI couldn\'t generate?",
+      "The struggle — and with it, the understanding that only comes from being in trouble with an idea",
+      "The clarity of authorship — it is becoming genuinely hard to locate, not because anyone is hiding it, but because the process distributes it",
+      "The obsolete question \'did you write it?\' — replaced by the harder question \'what did you bring?\'",
+    ]
+  },
+  {
+    domain: "Education",
+    kicker: "The essay that wrote itself",
+    title: ["ChatGPT and the", "end of the assignment"],
+    narrative: "In January 2023, a study found that ChatGPT could pass the bar exam, the US Medical Licensing Exam, and the final exams of MBA programmes at Wharton and University of Minnesota Law School. The same month, teachers across the world began reporting that essays submitted by students were AI-generated. The detection tools built in response were found to falsely flag human writing — disproportionately the writing of non-native English speakers. In New York City, schools banned ChatGPT. Within six months, most had quietly reversed the ban, having found it was impossible to enforce. The question was no longer whether students would use AI, but what education was supposed to be doing.",
+    fact: "A 2024 survey of 1,000 UK university students found that 53% had used AI to help write assessed work. Of these, 72% said they believed it had helped them learn. 41% said they believed it had replaced the learning they would otherwise have done. Both groups were probably right.",
+    cite: "HEPI Report, 2024",
+    argFor: "If AI can produce an essay, the essay was never testing what we thought it was. The task of education is to produce people who can think, not people who can produce artefacts that look like thinking.",
+    argAgainst: "Writing is not a method of demonstrating thought — it is a method of producing it. The essay that AI writes is not the essay you would have written by struggling through the argument yourself. The struggle is the education.",
+    prompt: ["AI can now pass professional exams, write essays,", "and produce work that assessors cannot reliably detect."],
+    stances: [
+      { label: "Something real was gained — a tool that extends what students can produce and explore", type: "gain" },
+      { label: "Something real was lost — the process of struggling through an argument alone", type: "loss" },
+      { label: "Both, and education has to decide what it is actually for", type: "both" },
+    ],
+    lostOptions: [
+      "The struggle — the productive difficulty that builds understanding",
+      "The teacher's ability to know what a student actually knows",
+      "The student's relationship with their own intellectual effort",
+      "The essay as a form — if AI writes them, they no longer mean what they meant",
+      "The distinction between understanding something and merely producing evidence that looks like understanding",
+    ]
+  }
+];
+
+let current = 0;
+let record = [];
+
+function startInstrument() {
+  document.getElementById('intro').classList.remove('active');
+  document.getElementById('case-screen').classList.add('active');
+  renderCase(0);
+}
+
+function renderCase(idx) {
+  const c = CASES[idx];
+  const total = CASES.length;
+
+  document.getElementById('progressFill').style.width = ((idx / total) * 100) + '%';
+  document.getElementById('caseCounter').textContent = `Case ${idx + 1} of ${total}`;
+  document.getElementById('caseDomain').textContent = c.domain;
+  document.getElementById('caseKicker').textContent = c.kicker;
+
+  const titleEl = document.getElementById('caseTitle');
+  titleEl.innerHTML = `${c.title[0]}<strong>${c.title[1]}</strong>`;
+
+  document.getElementById('caseNarrative').textContent = c.narrative;
+  document.getElementById('caseFact').innerHTML = `${c.fact}<cite>${c.cite}</cite>`;
+
+  document.getElementById('caseArguments').innerHTML = `
+    <div class="arg">
+      <div class="arg-label for">The case for it</div>
+      <div class="arg-text">${c.argFor}</div>
+    </div>
+    <div class="arg">
+      <div class="arg-label against">What was lost</div>
+      <div class="arg-text">${c.argAgainst}</div>
+    </div>
+  `;
+
+  document.getElementById('positionPrompt').innerHTML =
+    `${c.prompt[0]} <em>${c.prompt[1]}</em>`;
+
+  // Stance options
+  const stanceEl = document.getElementById('stanceOptions');
+  stanceEl.innerHTML = '';
+  let selectedStance = null;
+  c.stances.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'stance-opt';
+    btn.textContent = s.label;
+    btn.onclick = () => {
+      stanceEl.querySelectorAll('.stance-opt').forEach(b => {
+        b.className = 'stance-opt';
+      });
+      btn.classList.add('selected-' + s.type);
+      selectedStance = s;
+      updateNextBtn();
+    };
+    stanceEl.appendChild(btn);
+  });
+
+  // Lost options
+  const lostEl = document.getElementById('lostOptions');
+  lostEl.innerHTML = '';
+  let selectedLost = null;
+  c.lostOptions.forEach((l, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'lost-opt';
+    btn.textContent = l;
+    btn.onclick = () => {
+      lostEl.querySelectorAll('.lost-opt').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedLost = l;
+      updateNextBtn();
+    };
+    lostEl.appendChild(btn);
+  });
+
+  // Reflection
+  const reflInput = document.getElementById('reflectionInput');
+  reflInput.value = '';
+  reflInput.oninput = updateNextBtn;
+
+  function updateNextBtn() {
+    const hasStance = stanceEl.querySelector('.stance-opt[class*="selected"]');
+    const hasLost = lostEl.querySelector('.lost-opt.selected');
+    document.getElementById('nextBtn').disabled = !(hasStance && hasLost);
+
+    // Store to record
+    if (hasStance && hasLost) {
+      record[idx] = {
+        domain: c.domain,
+        stance: hasStance.textContent,
+        lost: hasLost.textContent,
+        reflection: reflInput.value
+      };
+    }
+  }
+
+  // Update next button text
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = idx < CASES.length - 1 ? 'Next case' : 'Final question';
+  nextBtn.onclick = nextCase;
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+function nextCase() {
+  // Save current state
+  const stanceEl = document.getElementById('stanceOptions');
+  const lostEl = document.getElementById('lostOptions');
+  const hasStance = stanceEl.querySelector('.stance-opt[class*="selected"]');
+  const hasLost = lostEl.querySelector('.lost-opt.selected');
+  if (hasStance && hasLost) {
+    record[current] = {
+      domain: CASES[current].domain,
+      stance: hasStance.textContent,
+      lost: hasLost.textContent,
+      reflection: document.getElementById('reflectionInput').value
+    };
+  }
+
+  current++;
+  if (current >= CASES.length) {
+    showClosing();
+  } else {
+    renderCase(current);
+  }
+}
+
+function showClosing() {
+  document.getElementById('case-screen').classList.remove('active');
+  document.getElementById('closing').classList.add('active');
+  document.getElementById('progressFill').style.width = '100%';
+
+  // Render record
+  const grid = document.getElementById('recordGrid');
+  grid.innerHTML = '';
+  CASES.forEach((c, i) => {
+    const r = record[i] || {};
+    const card = document.createElement('div');
+    card.className = 'record-card';
+    card.innerHTML = `
+      <div class="record-domain">${c.domain}</div>
+      <div class="record-stance">${r.stance || '—'}</div>
+      <div class="record-lost">${r.lost ? '→ ' + r.lost : ''}</div>
+    `;
+    grid.appendChild(card);
+  });
+
+  window.scrollTo(0, 0);
+}
+
+function restart() {
+  current = 0;
+  record = [];
+  document.getElementById('closing').classList.remove('active');
+  document.getElementById('case-screen').classList.remove('active');
+  document.getElementById('intro').classList.add('active');
+  document.getElementById('progressFill').style.width = '0%';
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
